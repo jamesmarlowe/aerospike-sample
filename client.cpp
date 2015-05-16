@@ -18,17 +18,17 @@ std::string get_cache(aerospike &as, std::string &snamespace, std::string &sset,
 
     //Initialize Key
     as_key key;
-    as_key_init(&key, snamespace, sset, skey);
+    as_key_init(&key, snamespace.c_str(), sset.c_str(), skey.c_str());
 
     //Read from database
     as_record* p_rec = NULL;
-    static const char* select[] = { sbin, NULL };
+    static const char* select[] = { sbin.c_str(), NULL };
     if (aerospike_key_select(&as, &err, NULL, &key, select, &p_rec) != AEROSPIKE_OK) {
         fprintf(stderr, "err(%d) %s at [%s:%d]\n", err.code, err.message, err.file, err.line);
     }
-    char * value = as_record_get_str(rec, bin);
-    return value
-    as_record_destroy(rec);
+    //char * value = as_record_get_str(p_rec, bin);
+    as_record_destroy(p_rec);
+    return value;
 }
 
 void set_cache(aerospike &as, std::string &snamespace, std::string &sset, std::string &skey, std::string &sbin, std::string &svalue)
@@ -37,15 +37,15 @@ void set_cache(aerospike &as, std::string &snamespace, std::string &sset, std::s
     
     //Initialize Key
     as_key key;
-    as_key_init(&key, snamespace, sset, skey);
+    as_key_init(&key, snamespace.c_str(), sset.c_str(), skey.c_str());
     
     //Initialize Record Data
     as_record rec;
     as_record_inita(&rec, 1);
-    as_record_set_str(&rec, sbin, svalue);
+    as_record_set_str(&rec, sbin, svalue.c_str());
 
     //Write to Database
-    if (aerospike_key_put(&as, &err, NULL, &key, rec) != AEROSPIKE_OK) {
+    if (aerospike_key_put(&as, &err, NULL, &key, &rec) != AEROSPIKE_OK) {
         fprintf(stderr, "err(%d) %s at [%s:%d]\n", err.code, err.message, err.file, err.line);
     }
 }
